@@ -6,15 +6,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
@@ -22,7 +20,6 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import net.sf.json.JSONObject;
@@ -50,16 +47,19 @@ public class HttpTools {
 		try {
 			HttpPost post = new HttpPost(url);
 			addHeaders(post);
+			JSONObject jsonParam = new JSONObject();
 			Set<String> keySet = map.keySet();
-			ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
 			for (String s : keySet) {
 				if (!"".equals(map.get(s))) {
-					NameValuePair param = new BasicNameValuePair(s, map.get(s));
-					params.add(param);
+					jsonParam.put(s, map.get(s));
 				}
 			}
-			post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+			StringEntity entity = new StringEntity(jsonParam.toString(),"UTF-8");
+			entity.setContentType("application/json");
+			post.setEntity(entity);
 			HttpResponse response = client.execute(post);
+			int responseCode = response.getStatusLine().getStatusCode();
+			System.out.println("HttpStatusCode: " + responseCode);
 			String resultString = EntityUtils.toString(response.getEntity());
 			resultJsonObject = JSONObject.fromObject(resultString);
 			if (resultJsonObject == null) {
@@ -134,7 +134,7 @@ public class HttpTools {
 	private static void addHeaders(HttpPost post) {
 		post.setHeader("x-xl-retry-times", Constant.RETRY_TIMES);
 		post.setHeader("x-xl-device", Constant.DEVICE);
-		post.setHeader("x-xl=device-model", Constant.DEVICE_MODEL);
+		post.setHeader("x-xl-device-model", Constant.DEVICE_MODEL);
 		post.setHeader("x-xl-device-os", Constant.DEVICE_OS);
 		post.setHeader("x-xl-channel", Constant.CHANNEL);
 		post.setHeader("x-xl-client", Constant.CLIENT);

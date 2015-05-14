@@ -24,7 +24,7 @@ public class ApiExcutor {
 
 	public JSONObject getJsonResp(String api) {
 		JSONObject resultObject = HttpTools.SendPostRequest(
-				CombineUrl(Constant.ONLINE_URL, api), http_param);
+				CombineUrl(Constant.TEST_URL, api), http_param);
 		http_param.clear();
 		return resultObject;
 	}

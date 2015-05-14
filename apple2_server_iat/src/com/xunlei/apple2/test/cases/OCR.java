@@ -27,7 +27,7 @@ public class OCR extends BaseCase {
 
 	@Test
 	public void result() {
-		excutor.setHttpParam("imageId", "6");
+		excutor.setHttpParam("imageId", imageId);
 		JSONObject result = excutor.getJsonResp("ocr.result");
 		assertNotNull(result);
 	}
